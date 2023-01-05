@@ -1,8 +1,8 @@
-import requests
-from pprint import pprint
+from models import Problem
 
-URL = "https://jutge.org/problems/{problem}/"
-PROBLEM = ""
-response = requests.get(URL.format(problem="P10694"))
-response.raise_for_status()
-pprint(response.text)
+p = Problem("P57548")
+soup = p._soup
+print(soup.head.title.string.split(" - "))
+ps = soup.find_all(class_="horizontal-view")
+for p in ps:
+    print(list(p.stripped_strings))
