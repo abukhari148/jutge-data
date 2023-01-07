@@ -2,7 +2,8 @@ import os
 import re
 import requests
 import bs4
-
+from exceptions import ProblemError
+from utils import get_public_tests
 
 JUTGED_DATA_DIR = os.path.expanduser(
     os.environ.get("JUTGED_DIR", os.path.join(os.getcwd(), ".config", "jutged"))
@@ -20,21 +21,28 @@ class Problem:
         self.id = id
         self.public_tests_fname = f"{self.id}_public_tests.json"
 
+    # TODO: add better representation when its called
+
     @property
     def id(self):
         return self._id
 
     @id.setter
     def id(self, value):
-        regex = "^P+\d{5}$"
+        regex = "^[pP]+\d{5}$"
         if isinstance(value, str) and re.match(regex, value):
             self._id = value.upper()
         else:
-            raise TypeError("Invalid Problem ID.")
+            raise ProblemError("Invalid Problem ID.")
 
     @property
     def url(self):
         return URL.format(id=self.id)
+
+    @property
+    def title(self):
+        # TODO: think of better implementation 
+        return self.public_tests["title"] 
 
     @property
     def _soup(self):
@@ -45,4 +53,4 @@ class Problem:
 
     @property
     def public_tests(self):
-        pass # maybe return a dict using function in get or maybe read data from file 
+        return get_public_tests(self._soup)
